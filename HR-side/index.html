@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Onboarding Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            background-color: #f6f9fc;
+            color: #333;
+        }
+        .main-header {
+            background-color: #1e2a44;
+            color: white;
+            padding: 15px 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header-content h1 {
+            margin: 0%;
+            font-size: 26px;
+            font-weight: 500;
+            align-items: center;
+            text-align: center;
+            margin-left: 380px;
+            height: 50px;
+        }
+        .header-nav button {
+            background-color: #ef5350;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+            width: 140px;
+        }
+        .header-nav button:hover {
+            background-color: #e53935;
+        }
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 120px auto 30px;
+            padding: 25px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .search-input {
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            width: 820px; /* Wider search bar */
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+        .search-input:focus {
+            border-color: #1976d2;
+            outline: none;
+        }
+        .search-btn, .clear-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background-color 0.3s;
+        }
+        .search-btn {
+            background-color: #1976d2;
+            color: white;
+            margin-right: 15px; /* Increased gap */
+        }
+        .search-btn:hover {
+            background-color: #1565c0;
+        }
+        .clear-btn {
+            background-color: #78909c;
+            color: white;
+        }
+        .clear-btn:hover {
+            background-color: #607d8b;
+        }
+        .employees-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .employees-table th, .employees-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 15px;
+        }
+        .employees-table th {
+            background-color: #e8eef4;
+            font-weight: 600;
+            color: #1e2a44;
+        }
+        .employees-table tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+        .employees-table tr:hover {
+            background-color: #f5f7fa;
+        }
+        .progress-bar-container {
+            width: 120px;
+            background-color: #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 12px;
+            background-color: #66bb6a;
+            border-radius: 12px;
+            transition: width 0.3s ease;
+        }
+        .status-pending {
+            color: #fb8c00;
+            font-weight: 600;
+        }
+        .status-approved {
+            color: #66bb6a;
+            font-weight: 600;
+        }
+        .status-rejected {
+            color: #ef5350;
+            font-weight: 600;
+        }
+        .action-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+        .view-btn {
+            background-color: #1976d2;
+            color: white;
+        }
+        .view-btn:hover {
+            background-color: #1565c0;
+        }
+        .delete-btn {
+            background-color: #ef5350;
+            color: white;
+        }
+        .delete-btn:hover {
+            background-color: #e53935;
+        }
+        .actions-cell {
+            display: flex;
+            gap: 10px;
+        }
+        #employeeDetailsModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            width: 100%;
+            max-width: 850px;
+            max-height: 85vh;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .modal-header {
+            background-color: #1e2a44;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h2 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 500;
+        }
+        .close-btn {
+            font-size: 28px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .close-btn:hover {
+            color: #fb8c00;
+        }
+        .employee-details {
+            padding: 25px;
+            overflow-y: auto;
+            flex-grow: 1;
+            font-size: 15px;
+        }
+        .employee-details h3 {
+            margin-top: 0;
+            color: #1e2a44;
+            border-bottom: 2px solid #f0f4f8;
+            padding-bottom: 8px;
+            font-size: 18px;
+        }
+        .employee-details p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .employee-details strong {
+            display: inline-block;
+            width: 160px;
+            color: #263238;
+            font-weight: 500;
+        }
+        .modal-footer {
+            padding: 20px;
+            background-color: #f0f4f8;
+            text-align: right;
+        }
+        .approve-btn, .reject-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+        .approve-btn {
+            background-color: #66bb6a;
+            color: white;
+        }
+        .approve-btn:hover {
+            background-color: #4caf50;
+        }
+        .reject-btn {
+            background-color: #ef5350;
+            color: white;
+        }
+        .reject-btn:hover {
+            background-color: #e53935;
+        }
+        .no-data-message {
+            text-align: center;
+            color: #78909c;
+            font-size: 17px;
+            margin: 25px 0;
+            font-style: italic;
+        }
+        .document-link, .document-view {
+            color: #1976d2;
+            text-decoration: none;
+            margin-right: 15px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .document-link:hover, .document-view:hover {
+            text-decoration: underline;
+        }
+        .document-view {
+            color: #fb8c00;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-content">
+            <h1>HR Onboarding Management</h1>
+           
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by name or email...">
+                <button class="search-btn" onclick="searchEmployees()">Search</button>
+                <button class="clear-btn" onclick="clearSearch()">Clear</button>
+                 <div class="header-nav">
+                <button onclick="clearAllData()">Clear All Data</button>
+            </div>
+            </div>
+        </div>
+       
+        <table class="employees-table" id="employeesTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Progress</th>
+                    <th>Last Updated</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="employeesTableBody"></tbody>
+             <div id="noDataMessage" class="no-data-message" style="display: none;">
+            No employees found matching your search criteria.
+        </div>
+        </table>
+    </div>
+
+    <div id="employeeDetailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="employeeName">Employee Details</h2>
+                <span class="close-btn" onclick="closeEmployeeDetailsModal()">×</span>
+            </div>
+            <div id="employeeDetailsContainer" class="employee-details"></div>
+            <div class="modal-footer">
+                <button class="approve-btn" onclick="approveEmployee()">Approve</button>
+                <button class="reject-btn" onclick="rejectEmployee()">Reject</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiBaseUrl = 'http://localhost:3000/api';
+        let currentEmployeeId = null;
+        let currentEmployeeName = '';
+
+        async function fetchEmployees() {
+            try {
+                const response = await fetch(`${apiBaseUrl}/employees`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch employees');
+                }
+                const employees = await response.json();
+                renderEmployees(employees);
+            } catch (error) {
+                console.error('Error fetching employees:', error);
+                alert('Error fetching employees. Please try again.');
+            }
+        }
+
+        function renderEmployees(employees) {
+            const tableBody = document.getElementById('employeesTableBody');
+            tableBody.innerHTML = '';
+            const noDataMessage = document.getElementById('noDataMessage');
+
+            if (employees.length === 0) {
+                noDataMessage.style.display = 'block';
+                return;
+            }
+
+            noDataMessage.style.display = 'none';
+
+            employees.forEach(employee => {
+                const row = document.createElement('tr');
+                const personalDetails = employee.personal_details || {};
+                const name = `${personalDetails.firstName || ''} ${personalDetails.lastName || ''}`.trim() || 'N/A';
+                const email = employee.email || 'N/A';
+                const progress = employee.progress || 0;
+                const lastUpdated = employee.last_updated ? new Date(employee.last_updated).toLocaleString() : 'N/A';
+                const status = employee.status || 'Pending';
+
+                row.innerHTML = `
+                    <td>${name}</td>
+                    <td>${email}</td>
+                    <td>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: ${progress}%"></div>
+                        </div>
+                    </td>
+                    <td>${lastUpdated}</td>
+                    <td class="status-${status.toLowerCase()}">${status}</td>
+                    <td class="actions-cell">
+                        <button class="action-btn view-btn" onclick="viewEmployeeDetails(${employee.id})">View</button>
+                        <button class="action-btn delete-btn" onclick="deleteEmployee(${employee.id}, '${name.replace(/'/g, "\\'")}')">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        async function searchEmployees() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            if (!searchTerm) {
+                fetchEmployees();
+                return;
+            }
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/employees/search/${encodeURIComponent(searchTerm)}`);
+                if (!response.ok) {
+                    throw new Error('Search failed');
+                }
+                const employees = await response.json();
+                renderEmployees(employees);
+            } catch (error) {
+                console.error('Error searching employees:', error);
+                alert('Error searching employees. Please try again.');
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            fetchEmployees();
+        }
+
+        async function viewEmployeeDetails(id) {
+            try {
+                console.log(`Fetching details for employee ID: ${id}`);
+                const response = await fetch(`${apiBaseUrl}/employees/${id}`);
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to fetch employee details');
+                }
+                const employee = await response.json();
+                currentEmployeeId = id;
+                currentEmployeeName = `${employee.personal_details?.firstName || ''} ${employee.personal_details?.lastName || ''}`.trim() || 'Employee';
+                renderEmployeeDetails(employee);
+                document.getElementById('employeeDetailsModal').style.display = 'flex';
+            } catch (error) {
+                console.error('Error fetching employee details:', error);
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        function renderEmployeeDetails(employee) {
+            const container = document.getElementById('employeeDetailsContainer');
+            const personalDetails = employee.personal_details || {};
+            const bankDetails = employee.bank_details || {};
+            const idUploads = employee.id_uploads || {};
+            const educationalDetails = employee.educational_details || [];
+            const previousCompany = employee.previous_company || [];
+            const isFresher = employee.is_fresher || false;
+
+            document.getElementById('employeeName').textContent = currentEmployeeName;
+
+            let detailsHtml = `
+                <h3>Personal Details</h3>
+                <p><strong>First Name:</strong> ${personalDetails.firstName || 'N/A'}</p>
+                <p><strong>Last Name:</strong> ${personalDetails.lastName || 'N/A'}</p>
+                <p><strong>Email:</strong> ${employee.email || 'N/A'}</p>
+                <p><strong>Phone:</strong> ${personalDetails.phone || 'N/A'}</p>
+                <p><strong>Guardian Name:</strong> ${personalDetails.guardianName || 'N/A'}</p>
+                <p><strong>Guardian Phone:</strong> ${personalDetails.guardianPhone || 'N/A'}</p>
+                <p><strong>Date of Birth:</strong> ${personalDetails.dateOfBirth ? new Date(personalDetails.dateOfBirth).toLocaleDateString() : 'N/A'}</p>
+                <p><strong>Gender:</strong> ${personalDetails.gender || 'N/A'}</p>
+                <p><strong>Marital Status:</strong> ${personalDetails.maritalStatus || 'N/A'}</p>
+
+                <h3>Bank Details</h3>
+                <p><strong>Account Holder:</strong> ${bankDetails.accountHolder || 'N/A'}</p>
+                <p><strong>Bank Name:</strong> ${bankDetails.bankName || 'N/A'}</p>
+                <p><strong>Account Number:</strong> ${bankDetails.accountNumber || 'N/A'}</p>
+                <p><strong>Branch:</strong> ${bankDetails.bankBranch || 'N/A'}</p>
+                <p><strong>IFSC Code:</strong> ${bankDetails.ifscCode || 'N/A'}</p>
+                <p><strong>Location:</strong> ${bankDetails.bankLocation || 'N/A'}</p>
+                <p><strong>Pin Code:</strong> ${bankDetails.pinCode || 'N/A'}</p>
+
+                <h3>ID Uploads</h3>
+            `;
+
+            // Render ID uploads
+            const idFields = ['panCard', 'aadharCard', 'passport'];
+            idFields.forEach(field => {
+                const upload = idUploads[field];
+                if (upload && upload.data) {
+                    detailsHtml += `<p><strong>${field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</strong> `;
+                    detailsHtml += renderDocument(upload, field);
+                    detailsHtml += `</p>`;
+                } else {
+                    detailsHtml += `<p><strong>${field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</strong> Not uploaded</p>`;
+                }
+            });
+
+            // Render educational details
+            detailsHtml += `<h3>Educational Details</h3>`;
+            if (educationalDetails.length === 0) {
+                detailsHtml += `<p>No educational details provided.</p>`;
+            } else {
+                educationalDetails.forEach((edu, index) => {
+                    detailsHtml += `
+                        <p><strong>Education ${index + 1}:</strong></p>
+                        <p><strong>Type:</strong> ${edu.education_type || 'N/A'}</p>
+                        <p><strong>Institution:</strong> ${edu.institution_name || 'N/A'}</p>
+                        <p><strong>Branch:</strong> ${edu.branch || 'N/A'}</p>
+                        <p><strong>Passout Year:</strong> ${edu.passout_year || 'N/A'}</p>
+                        <p><strong>Percentage:</strong> ${edu.percentage || 'N/A'}</p>
+                        <p><strong>Location:</strong> ${edu.location || 'N/A'}</p>
+                        <p><strong>Certificate:</strong> `;
+                    if (edu.certificate && edu.certificate.data) {
+                        detailsHtml += renderDocument(edu.certificate, `certificate_${index}`);
+                    } else {
+                        detailsHtml += 'Not uploaded';
+                    }
+                    detailsHtml += `</p>`;
+                });
+            }
+
+            // Render previous employment
+            detailsHtml += `<h3>Previous Employment</h3>`;
+            if (isFresher) {
+                detailsHtml += `<p>Employee is a fresher.</p>`;
+            } else if (previousCompany.length === 0) {
+                detailsHtml += `<p>No previous employment details provided.</p>`;
+            } else {
+                previousCompany.forEach((job, index) => {
+                    detailsHtml += `
+                        <p><strong>Employment ${index + 1}:</strong></p>
+                        <p><strong>Company Name:</strong> ${job.company_name || 'N/A'}</p>
+                        <p><strong>Designation:</strong> ${job.designation || 'N/A'}</p>
+                        <p><strong>Experience:</strong> ${job.experience || 'N/A'} years</p>
+                        <p><strong>Start Date:</strong> ${job.start_date ? new Date(job.start_date).toLocaleDateString() : 'N/A'}</p>
+                        <p><strong>End Date:</strong> ${job.end_date ? new Date(job.end_date).toLocaleDateString() : 'N/A'}</p>
+                        <p><strong>Location:</strong> ${job.location || 'N/A'}</p>
+                        <p><strong>Relieving Letter:</strong> `;
+                    if (job.relieving_letter && job.relieving_letter.data) {
+                        detailsHtml += renderDocument(job.relieving_letter, `relieving_letter_${index}`);
+                    } else {
+                        detailsHtml += 'Not uploaded';
+                    }
+                    detailsHtml += `</p>
+                        <p><strong>Experience Letter:</strong> `;
+                    if (job.experience_letter && job.experience_letter.data) {
+                        detailsHtml += renderDocument(job.experience_letter, `experience_letter_${index}`);
+                    } else {
+                        detailsHtml += 'Not uploaded';
+                    }
+                    detailsHtml += `</p>`;
+                });
+            }
+
+            // Render status and progress
+            detailsHtml += `
+                <h3>Status</h3>
+                <p><strong>Progress:</strong> ${employee.progress || 0}%</p>
+                <p><strong>Status:</strong> ${employee.status || 'Pending'}</p>
+                <p><strong>Last Updated:</strong> ${employee.last_updated ? new Date(employee.last_updated).toLocaleString() : 'N/A'}</p>
+            `;
+
+            container.innerHTML = detailsHtml;
+
+            // Disable approve/reject buttons if status is not Pending
+            const approveBtn = document.querySelector('.approve-btn');
+            const rejectBtn = document.querySelector('.reject-btn');
+            if (employee.status !== 'Pending') {
+                approveBtn.disabled = true;
+                rejectBtn.disabled = true;
+                approveBtn.style.opacity = '0.5';
+                rejectBtn.style.opacity = '0.5';
+            } else {
+                approveBtn.disabled = false;
+                rejectBtn.disabled = false;
+                approveBtn.style.opacity = '1';
+                rejectBtn.style.opacity = '1';
+            }
+        }
+
+        // Updated renderDocument with validation and logging
+        function renderDocument(file, id) {
+            if (!file || !file.data || !file.type) {
+                console.error(`Invalid document for ${id}:`, file);
+                return 'Invalid document';
+            }
+            const fileName = file.name || 'document';
+            const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+            if (!allowedTypes.includes(file.type)) {
+                console.warn(`Unsupported file type for ${id}: ${file.type}`);
+                return 'Unsupported file type';
+            }
+
+            // Validate Base64 data format
+            const mimePrefix = `data:${file.type};base64,`;
+            let dataUrl = file.data;
+            if (!dataUrl.startsWith('data:')) {
+                console.warn(`Base64 data for ${id} missing MIME prefix, adding: ${mimePrefix}`);
+                dataUrl = `${mimePrefix}${dataUrl}`;
+            }
+
+            console.log(`Rendering document ${id}: type=${file.type}, name=${fileName}, dataLength=${dataUrl.length}`);
+
+            // Add View and Download buttons
+            return `
+                <span class="document-view" onclick="viewDocument('${dataUrl.replace(/'/g, "\\'")}', '${file.type.replace(/'/g, "\\'")}')">View</span>
+                <a href="${dataUrl}" download="${fileName}" class="document-link">Download ${fileName}</a>
+            `;
+        }
+
+        // Updated viewDocument to handle documents as Blobs for reliability
+        function viewDocument(dataUrl, fileType) {
+            try {
+                // Validate data URL
+                if (!dataUrl.startsWith('data:')) {
+                    console.error('Invalid data URL:', dataUrl.substring(0, 50));
+                    alert('Failed to open document: Invalid data format. Please try downloading it instead.');
+                    return;
+                }
+
+                // Extract Base64 data (remove MIME prefix)
+                const base64Data = dataUrl.split(',')[1];
+                if (!base64Data) {
+                    console.error('No Base64 data found in URL:', dataUrl.substring(0, 50));
+                    alert('Failed to open document: No data available. Please try downloading it instead.');
+                    return;
+                }
+
+                // Convert Base64 to binary
+                const binary = atob(base64Data);
+                const array = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) {
+                    array[i] = binary.charCodeAt(i);
+                }
+
+                // Create Blob with correct MIME type
+                const blob = new Blob([array], { type: fileType });
+                const blobUrl = URL.createObjectURL(blob);
+
+                // Open Blob URL in new tab
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                // Clean up Blob URL
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+            } catch (error) {
+                console.error('Error opening document:', error);
+                alert('Failed to open document. Please try downloading it or check the console for details.');
+            }
+        }
+
+        function closeEmployeeDetailsModal() {
+            document.getElementById('employeeDetailsModal').style.display = 'none';
+            currentEmployeeId = null;
+            currentEmployeeName = '';
+        }
+
+        async function approveEmployee() {
+            if (!currentEmployeeId) return;
+            if (!confirm(`Are you sure you want to approve ${currentEmployeeName}?`)) return;
+            try {
+                const response = await fetch(`${apiBaseUrl}/employees/${currentEmployeeId}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'Approved' })
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to approve employee');
+                }
+                alert(`${currentEmployeeName} approved successfully`);
+                closeEmployeeDetailsModal();
+                fetchEmployees();
+            } catch (error) {
+                console.error('Error approving employee:', error);
+                alert('Error approving employee. Please try again.');
+            }
+        }
+
+        async function rejectEmployee() {
+            if (!currentEmployeeId) return;
+            if (!confirm(`Are you sure you want to reject ${currentEmployeeName}?`)) return;
+            try {
+                const response = await fetch(`${apiBaseUrl}/employees/${currentEmployeeId}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'Rejected' })
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to reject employee');
+                }
+                alert(`${currentEmployeeName} rejected successfully`);
+                closeEmployeeDetailsModal();
+                fetchEmployees();
+            } catch (error) {
+                console.error('Error rejecting employee:', error);
+                alert('Error rejecting employee. Please try again.');
+            }
+        }
+
+        async function deleteEmployee(id, name) {
+            if (!confirm(`Are you sure you want to delete ${name}?`)) return;
+            try {
+                const response = await fetch(`${apiBaseUrl}/employees/${id}`, {
+                    method: 'DELETE'
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to delete employee');
+                }
+                alert(`${name} deleted successfully`);
+                fetchEmployees();
+            } catch (error) {
+                console.error('Error deleting employee:', error);
+                alert('Error deleting employee. Please try again.');
+            }
+        }
+
+        async function clearAllData() {
+            if (!confirm('Are you sure you want to delete all employee data? This action cannot be undone.')) return;
+            try {
+                const employees = await fetch(`${apiBaseUrl}/employees`).then(res => res.json());
+                const deletePromises = employees.map(employee =>
+                    fetch(`${apiBaseUrl}/employees/${employee.id}`, { method: 'DELETE' })
+                );
+                await Promise.all(deletePromises);
+                alert('All employee data cleared successfully');
+                fetchEmployees();
+            } catch (error) {
+                console.error('Error clearing all data:', error);
+                alert('Error clearing all data. Please try again.');
+            }
+        }
+
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchEmployees();
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    searchEmployees();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
