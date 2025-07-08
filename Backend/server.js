@@ -208,5 +208,5 @@ app.get('/api/employees/search/:term', async (req, res, next) => {
 app.use(errorHandler);
 
 app.listen(port, () => {
-    console.log(`Server running on http://13.61.3.24:${port}`);
+    console.log(`Server running on http://16.170.249.150:${port}`);
 });
