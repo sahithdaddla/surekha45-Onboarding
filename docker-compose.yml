@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: admin123
       POSTGRES_DB: onboarding_system
     ports:
-      - "5521:5432"
+      - "5608:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -19,9 +19,9 @@ services:
     build: ./Backend
     container_name: onboarding-backend
     ports:
-      - "3094:3094"
+      - "3608:3608"
     environment:
-      PORT: 3094
+      PORT: 3608
       DB_USER: postgres
       DB_PASSWORD: admin123
       DB_NAME: onboarding_system
@@ -34,7 +34,7 @@ services:
     build: ./Employee-side
     container_name: onboarding-employee
     ports:
-      - "8323:80"
+      - "8616:80"
     depends_on:
       - backend
 
@@ -42,7 +42,7 @@ services:
     build: ./HR-side
     container_name: onboarding-hr
     ports:
-      - "8324:80"
+      - "8617:80"
     depends_on:
       - backend
 
